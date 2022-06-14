@@ -1,5 +1,5 @@
 const createHttpError = require('http-errors')
-const Joi = require('joi')
+const joi = require('joi')
 const Validators = require('../validators/index.validator')
 
 module.exports = function (validator) {

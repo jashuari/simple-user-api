@@ -1,7 +1,7 @@
 const User = require('../models/user.model')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const handleError = require('../helpers/utils')
+const e = require('../helpers/utils')
 
 // User register
 exports.signUp = async (req, res) => {
@@ -30,7 +30,7 @@ exports.signUp = async (req, res) => {
       user: createdUser,
     })
   } catch (error) {
-    handleError(res, error)
+    e.handleError(res, error)
   }
 }
 
@@ -69,6 +69,6 @@ exports.login = async (req, res) => {
       token: token,
     })
   } catch (error) {
-    handleError(res, error)
+    e.handleError(res, error)
   }
 }

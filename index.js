@@ -9,6 +9,15 @@ app.use(cookieParser())
 
 require('./routes/index')(app)
 
+app.use((err, req, res, next) => {
+  // because err.status is undefined
+  res.status(404).json({
+    error: {
+      message: err.message,
+    },
+  })
+})
+
 const PORT = process.env.PORT || 3000
 const http = require('http')
 const server = http.Server(app)

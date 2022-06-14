@@ -3,7 +3,7 @@ const Like = require('../models/like.model')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const Sequelize = require('sequelize')
-const handleError = require('../helpers/utils')
+const e = require('../helpers/utils')
 const Op = Sequelize.Op
 
 exports.me = (req, res) => {
@@ -13,7 +13,7 @@ exports.me = (req, res) => {
       user: req.user,
     })
   } catch (error) {
-    handleError(res, error)
+    e.handleError(res, error)
   }
 }
 
@@ -41,7 +41,7 @@ exports.getUser = async (req, res) => {
       unlikes: unlikes,
     })
   } catch (error) {
-    handleError(res, error)
+    e.handleError(res, error)
   }
 }
 
@@ -86,7 +86,7 @@ exports.updatePassword = async (req, res) => {
       })
     }
   } catch (error) {
-    handleError(res, error)
+    e.handleError(res, error)
   }
 }
 
@@ -127,7 +127,7 @@ exports.like = async (req, res) => {
       })
     }
   } catch (error) {
-    handleError(res, error)
+    e.handleError(res, error)
   }
 }
 
@@ -167,7 +167,7 @@ exports.unLike = async (req, res, next) => {
       })
     }
   } catch (error) {
-    handleError(res, error)
+    e.handleError(res, error)
   }
 }
 
@@ -197,6 +197,6 @@ exports.mostLiked = async (req, res) => {
       })
     })
     .catch((err) => {
-      handleError(res, error)
+      e.handleError(res, err)
     })
 }

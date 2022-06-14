@@ -1,10 +1,8 @@
-const handleError = (res = {}, err = {}) => {
+exports.handleError = (res = {}, err = {}) => {
   // Sends error to user
-  res.status(err.code).json({
+  res.status(500).json({
     errors: {
-      msg: err.message,
+      messages: err.message,
     },
   })
 }
-
-module.exports = { handleError }

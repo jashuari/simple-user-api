@@ -1,8 +1,8 @@
-const Joi = require('joi')
+const joi = require('joi')
 
-const registerSchema = Joi.object({
-  username: Joi.string().min(1).required(),
-  password: Joi.string().min(4).required(),
+const registerSchema = joi.object({
+  username: joi.string().min(1).required(),
+  password: joi.string().min(4).required(),
 })
 
 module.exports = registerSchema

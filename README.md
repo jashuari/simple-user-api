@@ -14,7 +14,6 @@ Start MYSQL:
 -d \
 --name mysql_server \
 -e MYSQL_DATABASE='povio' \
--e MYSQL_USER='root' \
 -e MYSQL_PASSWORD='adminadmin' \
 -e MYSQL_ROOT_PASSWORD='adminadmin' \
 --network node-api-network \
