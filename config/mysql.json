@@ -1,0 +1,13 @@
+{
+	"DATABASE": "povio",
+	"USER": "root",
+	"PASSWORD": "adminadmin",
+	"HOST": "localhost",
+	"DIALECT": "mysql",
+	"POOL": {
+		"MAX": 10,
+		"MIN": 0,
+		"ACQUIRE": 30000,
+		"IDLE": 10000
+	}
+}
