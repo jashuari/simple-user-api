@@ -1,7 +1,7 @@
 'use strict'
 
 const jwt = require('jsonwebtoken')
-const User = require('../models/user.model')
+const User = require('../db/models/user.model')
 
 exports.auth = async function (req, res, next) {
   if (!req.headers.cookie)

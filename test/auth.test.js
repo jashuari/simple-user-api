@@ -7,8 +7,8 @@ const { faker } = require('@faker-js/faker')
 const should = chai.should()
 
 const loginDetails = {
-  username: faker.random.words(),
-  password: faker.random.words(),
+  username: faker.internet.userName(),
+  password: faker.internet.password(),
 }
 
 const badLoginDetails = {
@@ -16,7 +16,6 @@ const badLoginDetails = {
   password: faker.internet.password(),
 }
 
-const username = faker.internet.userName()
 const createdID = []
 
 chai.use(chaiHttp)
@@ -78,7 +77,7 @@ describe('/POST signUp', () => {
       .end((err, res) => {
         res.should.have.status(422)
         res.body.should.be.a('object')
-        res.body.should.have.property('error')
+        res.body.should.have.all.property('error')
         done()
       })
   })

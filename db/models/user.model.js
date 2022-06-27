@@ -1,7 +1,7 @@
 'use strict'
 
 const Sequelize = require('sequelize')
-const sequelize = require('./connection')
+const sequelize = require('../connection')
 
 module.exports = sequelize.define(
   'user',

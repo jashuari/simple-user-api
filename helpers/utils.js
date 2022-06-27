@@ -5,4 +5,5 @@ exports.handleError = (res = {}, err = {}) => {
       messages: err.message,
     },
   })
+  return
 }

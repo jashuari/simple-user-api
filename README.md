@@ -1,32 +1,18 @@
-Hi,
+## Ari-Povio Assignment
+Povio - Assignment
 
-I'm using mysql relational database I'm utilizing the relation to create a One-To-One ( 1:1 ) relationship.
+## Description
+REST API in NodeJS.
 
-Build image
-- docker build -t node-api:v1 .
+I'm using postgresql relational database I'm utilizing the relation One-To-One relationship , with the foreign key being defined in the source model.
+I'm also using Sequelize as ORM.
+For data validation i'm using 'joi'.
 
-create network
-- docker network create node-api-network
+For the testing purposes I'm using mocha and chai.
+## How to start / Test
 
-Start MYSQL:
-- docker run \
---rm \
--d \
---name mysql_server \
--e MYSQL_DATABASE='povio' \
--e MYSQL_PASSWORD='adminadmin' \
--e MYSQL_ROOT_PASSWORD='adminadmin' \
---network node-api-network \
-mysql:latest 
-
-Start node-api
-docker run \
---rm \
---name node-app \
---network node-api-network \
--p 3000:3000 \
--v $(pwd):/app \
-node-api:v1 
-
-start using
-docker-compose up
+- Run `npm install` 
+- Run `docker-compose up -d` 
+- Run `npm run db:create` 
+- Run `npm run start:dev`
+- Run `npm run test`

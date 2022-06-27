@@ -26,8 +26,6 @@ describe('/GET User', () => {
         res.should.have.status(201)
         res.body.should.be.an('object')
         res.body.user.should.include.keys('username', 'password')
-        console.log('res.body', res.body)
-        createdID.push(res.body._id)
         chai
           .request(server)
           .post('/login')

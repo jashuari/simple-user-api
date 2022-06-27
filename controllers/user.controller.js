@@ -1,5 +1,5 @@
-const User = require('../models/user.model')
-const Like = require('../models/like.model')
+const User = require('../db/models/user.model')
+const Like = require('../db/models/like.model')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const Sequelize = require('sequelize')
@@ -8,7 +8,7 @@ const Op = Sequelize.Op
 
 exports.me = (req, res) => {
   try {
-    res.status(200).json({
+    return res.status(200).json({
       messages: 'Information about your account',
       user: req.user,
     })
@@ -24,21 +24,13 @@ exports.getUser = async (req, res) => {
     const likes = await Like.count({
       where: {
         username: req.params.id,
-        like: true,
+        like: 1,
       },
     })
 
-    const unlikes = await Like.count({
-      where: {
-        username: req.params.id,
-        like: false,
-      },
-    })
-
-    res.status(200).json({
+    return res.status(200).json({
       username: user.username,
       likes: likes,
-      unlikes: unlikes,
     })
   } catch (error) {
     e.handleError(res, error)
@@ -70,6 +62,7 @@ exports.updatePassword = async (req, res) => {
           Date.now() + process.env.COOKIE_EXPIRES * 24 * 60 * 60 * 1000
         ),
         httpOnly: true,
+        // secure: true,
       }
 
       res.cookie('Bearer', token, cookie)
@@ -92,38 +85,36 @@ exports.updatePassword = async (req, res) => {
 
 exports.like = async (req, res) => {
   try {
-    const userLiked = await Like.findOne({ where: { user_id: req.user.id } })
+    // Check if user exists
+    const user = await User.findOne({
+      where: { id: req.params.id },
+    })
+
+    if (!user) {
+      return res.status(422).json({
+        status: 'error',
+        messages: "This user doesn't exist",
+      })
+    }
+
+    const userLiked = await Like.findOne({
+      where: { user_id: req.user.id, username: req.params.id },
+    })
 
     if (!userLiked) {
       const liked = await Like.create({
         username: req.params.id,
         user_id: req.user.id,
+        like: 1,
       })
-
-      res.status(200).json({
+      return res.status(200).json({
         status: 'success',
         messages: liked,
       })
-    }
-
-    if (userLiked.dataValues.like)
+    } else {
       return res.status(422).json({
         status: 'error',
         messages: 'You already have liked this user',
-      })
-    else {
-      const likedobj = await Like.update(
-        {
-          like: true,
-        },
-        {
-          where: { user_id: req.user.id },
-        }
-      )
-
-      res.status(200).json({
-        status: 'success',
-        messages: likedobj,
       })
     }
   } catch (error) {
@@ -131,41 +122,39 @@ exports.like = async (req, res) => {
   }
 }
 
-exports.unLike = async (req, res, next) => {
+exports.unLike = async (req, res) => {
   try {
-    const userUnlked = await Like.findOne({ where: { user_id: req.user.id } })
+    // Check if user exists
+    const user = await User.findOne({
+      where: { id: req.params.id },
+    })
 
-    if (!userUnlked) {
-      const unliked = await Like.create({
-        username: req.params.id,
-        user_id: req.user.id,
-        like: false,
-      })
-
-      res.status(200).json({
-        status: 'success',
-        messages: unliked,
+    if (!user) {
+      return res.status(422).json({
+        status: 'error',
+        messages: "This user doesn't exist",
       })
     }
-    if (userUnlked.like == false) {
+
+    const userUnlked = await Like.findOne({
+      where: { user_id: req.user.id, username: req.params.id },
+    })
+
+    if (userUnlked) {
+      const unliked = await Like.destroy({
+        where: { user_id: req.user.id, username: req.params.id },
+      })
+    } else {
       return res.status(422).json({
         status: 'error',
         messages: 'You already have unliked this user',
       })
-    } else {
-      const unlikedObj = await Like.update(
-        {
-          like: false,
-        },
-        {
-          where: { user_id: req.user.id },
-        }
-      )
-      res.status(200).json({
-        status: 'success',
-        messages: `You unliked this user ${unlikedObj}`,
-      })
     }
+
+    return res.status(200).json({
+      status: 'success',
+      messages: 'you have unliked the user',
+    })
   } catch (error) {
     e.handleError(res, error)
   }
@@ -173,6 +162,7 @@ exports.unLike = async (req, res, next) => {
 
 exports.mostLiked = async (req, res) => {
   Like.belongsTo(User, { foreignKey: 'user_id' })
+
   await Like.findAll({
     group: [['user.username']],
     attributes: [
@@ -183,11 +173,11 @@ exports.mostLiked = async (req, res) => {
         model: User,
         attributes: ['username'],
         required: true,
-        on: { id: { [Op.col]: 'Like.username' } },
+        on: { id: { [Op.col]: '"like"."username"' } },
         duplicating: false,
       },
     ],
-    order: [[Like.sequelize.literal('totalLikesCount'), 'DESC']],
+    order: [[Like.sequelize.literal('"totalLikesCount"'), 'DESC']],
     raw: true,
   })
     .then((rst) => {

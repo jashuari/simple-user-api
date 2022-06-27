@@ -2,28 +2,23 @@ const chai = require('chai')
 const chaiHttp = require('chai-http')
 const server = require('../index')
 const { faker } = require('@faker-js/faker')
-
+const Sequelize = require('sequelize')
 //assertions
 const should = chai.should()
 const expect = chai.expect
 
-const loginDetails = {
-  username: 'povio',
-  password: '1234',
-}
-
-const userDetails = {
-  username: faker.internet.userName(),
-  password: faker.internet.password(),
-}
-
+let userId = 0
 const mixLoginDetails = {
   username: faker.internet.userName(),
   password: faker.internet.password(),
 }
 let token = []
 chai.use(chaiHttp)
-describe('/GET User', () => {
+describe('/POST User', () => {
+  Sequelize.beforeConnect(async () => {
+    console.log('test', server)
+  })
+  Sequelize.afterConnect(async () => {})
   it('it should POST signUp', (done) => {
     const userLogin = {
       username: faker.internet.userName(),
@@ -38,34 +33,7 @@ describe('/GET User', () => {
         res.body.should.be.an('object')
         res.body.user.should.include.keys('username', 'password')
         token = res.body.token
-        done()
-      })
-  })
-
-  it('it should GET token as user', (done) => {
-    chai
-      .request(server)
-      .post('/signup')
-      .send(userDetails)
-      .end((err, res) => {
-        console.log('userDetails signup', userDetails)
-        res.should.have.status(201)
-        res.body.should.be.an('object')
-        res.body.user.should.include.keys('username', 'password')
-				token = res.body.token
-				done()
-      })
-  })
-
-  it('it should GET the users with Id', (done) => {
-    chai
-      .request(server)
-      .get('/user/1/')
-      .end((err, res) => {
-        res.should.have.status(200)
-        res.body.should.be.an('object')
-        res.body.should.have.property('username')
-        res.body.should.have.property('likes')
+        userId = res.body.user.id
         done()
       })
   })
@@ -96,10 +64,35 @@ describe('/GET User', () => {
         done()
       })
   })
-  it('Should ADD a Like to user POST', (done) => {
+
+  it('it should GET the users with Id', (done) => {
     chai
       .request(server)
-      .post('/user/1/like')
+      .get('/me')
+      .set('Cookie', `${token}`)
+      .end((err, res) => {
+        res.should.have.status(200)
+        res.body.should.be.an('object')
+        res.body.user.should.have.property('username')
+        res.body.user.should.have.property('password')
+        res.body.user.should.have.property('id')
+        userId = res.body.user.id
+        chai
+          .request(server)
+          .get(`/user/${userId}`)
+          .end((err, res) => {
+            res.should.have.status(200)
+            res.body.should.be.an('object')
+            res.body.should.have.property('username')
+            res.body.should.have.property('likes')
+            done()
+          })
+      })
+  })
+  it('Should add a Like to user POST', (done) => {
+    chai
+      .request(server)
+      .post(`/user/${userId}/like`)
       .set('Cookie', `${token}`)
       .end(function (err, res) {
         expect(res).to.have.status(200)
@@ -112,13 +105,11 @@ describe('/GET User', () => {
 
 describe('/POST user', () => {
   it('can like user only once,', (done) => {
-    const user = {}
     chai
       .request(server)
-      .post('/user/1/like')
+      .post(`/user/${userId}/like`)
       .set('Cookie', `${token}`)
       .end((err, res) => {
-        console.log('res', res.body)
         res.should.have.status(422)
         res.body.should.be.a('object')
         res.body.should.have
@@ -131,13 +122,14 @@ describe('/POST user', () => {
   it('can unlike user', (done) => {
     chai
       .request(server)
-      .post('/user/1/unlike')
+      .post(`/user/${userId}/unlike`)
       .set('Cookie', `${token}`)
       .end((err, res) => {
-        console.log('res', res.body)
         res.should.have.status(200)
         res.body.should.be.a('object')
-        res.body.should.have.property('messages').eql('You unliked this user 1')
+        res.body.should.have
+          .property('messages')
+          .eql('you have unliked the user')
         done()
       })
   })

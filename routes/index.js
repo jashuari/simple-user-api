@@ -2,7 +2,7 @@ const authRoute = require('./auth.root')
 const userRoute = require('./user.root')
 const profileRoute = require('./profile.root')
 
-module.exports = (app) => {
+module.exports = async (app) => {
   app.get('/', function (req, res) {
     res.send({
       messages: 'Hello',

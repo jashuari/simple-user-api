@@ -1,4 +1,4 @@
-const User = require('../models/user.model')
+const User = require('../db/models/user.model')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const e = require('../helpers/utils')
@@ -25,7 +25,7 @@ exports.signUp = async (req, res) => {
       password: hashedPassword,
     })
 
-    res.status(201).json({
+    return res.status(201).json({
       messages: 'User created',
       user: createdUser,
     })
@@ -60,6 +60,7 @@ exports.login = async (req, res) => {
         Date.now() + process.env.COOKIE_EXPIRES * 24 * 60 * 60 * 1000
       ),
       httpOnly: true,
+      // secure: true, 
     }
 
     res.cookie('Bearer', token, cookie)
