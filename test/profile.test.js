@@ -9,7 +9,7 @@ const should = chai.should()
 const expect = chai.expect
 
 const loginDetails = {
-  username: 'ariPovio',
+  username: 'ari-test',
   password: 'newpw',
 }
 
